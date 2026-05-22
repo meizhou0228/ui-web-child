@@ -1,0 +1,12 @@
+:root {
+  --color-sky:     #7DD3FC;
+  --color-mint:    #A7F3D0;
+  --color-peach:   #FECACA;
+  --color-gold:    #FCD34D;
+  --color-grape:   #C4B5FD;
+  --color-cream:   #FEF3C7;
+  --shadow-soft:   0 20px 40px -10px rgba(0,0,0,0.15);
+  --shadow-3d:     0 10px 0 #d4d4d4, 0 15px 25px rgba(0,0,0,0.2);
+  --radius-big:    24px;
+  --radius-huge:   40px;
+}

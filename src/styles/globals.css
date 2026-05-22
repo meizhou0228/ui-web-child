@@ -1,0 +1,14 @@
+@import './theme.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    background: linear-gradient(180deg, var(--color-cream) 0%, #FFFFFF 100%);
+    color: #1f2937;
+    font-family: 'ZCOOL KuaiLe', 'LXGW WenKai', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
