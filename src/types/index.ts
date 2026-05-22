@@ -11,6 +11,9 @@ export interface Category {
   accentColor: string;
 }
 
+/**
+ * User-defined or preset habit/check-in item.
+ */
 export interface Task {
   id: string;
   categoryId: CategoryId;
@@ -24,6 +27,9 @@ export interface Task {
   createdAt: number;
 }
 
+/**
+ * Frozen copy of a Task at event time; protects history from later edits.
+ */
 export interface TaskSnapshot {
   name: string;
   icon: string;
@@ -31,6 +37,11 @@ export interface TaskSnapshot {
   points: number;
 }
 
+/**
+ * Point-record entry. Each successful checkIn appends one.
+ * Note: named `Record` deliberately — downstream files that need
+ * the TS global utility type import this as `Record as PointRecord`.
+ */
 export interface Record {
   id: string;
   taskId: string;
@@ -41,6 +52,9 @@ export interface Record {
   note?: string;
 }
 
+/**
+ * Item the child can spend points on.
+ */
 export interface Reward {
   id: string;
   name: string;
@@ -51,12 +65,18 @@ export interface Reward {
   createdAt: number;
 }
 
+/**
+ * Frozen copy of a Reward at event time; protects history from later edits.
+ */
 export interface RewardSnapshot {
   name: string;
   icon: string;
   cost: number;
 }
 
+/**
+ * Audit log entry for a redemption transaction. Snapshots reward at redemption time.
+ */
 export interface Redemption {
   id: string;
   rewardId: string;
@@ -66,6 +86,9 @@ export interface Redemption {
   status: RedemptionStatus;
 }
 
+/**
+ * Threshold badge unlocked at lifetime-earned milestones.
+ */
 export interface Milestone {
   id: string;
   threshold: number;
