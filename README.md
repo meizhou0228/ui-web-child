@@ -20,6 +20,17 @@ npm run dev          # http://localhost:5173
 - `npm run test:run` — run tests once
 - `npm run typecheck` — TypeScript noEmit check
 
+## Install on phone as PWA
+
+```bash
+npm run build
+npm run preview -- --host 0.0.0.0
+```
+
+Open the shown `Network` URL on the phone, then use the browser menu to add it to the home screen. After the first successful load, the app shell and assets are cached for offline use. Data remains on that phone in browser localStorage.
+
+Note: service workers require a secure context. `localhost` works on the same device; phone access may need HTTPS or a secure local tunnel depending on the mobile browser.
+
 ## Architecture
 
 - React 18 + Vite + TypeScript

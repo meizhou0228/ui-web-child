@@ -5,6 +5,8 @@ import { TaskItem } from '@/components/TaskItem';
 import { BirthdayBanner } from '@/components/BirthdayBanner';
 import { FloatingBackground } from '@/components/FloatingBackground';
 import { MascotCorner } from '@/components/MascotCorner';
+import { AdventureMap } from '@/components/AdventureMap';
+import { TodayEncouragement } from '@/components/TodayEncouragement';
 import { useStore } from '@/store';
 import { selectTodayCountsByTask, selectTodayLastRecordByTask } from '@/store/selectors';
 import { isoWeekKey } from '@/utils/date';
@@ -57,6 +59,13 @@ export function TodayPage() {
     return m;
   }, [records]);
 
+  const activeTasks = useMemo(() => tasks.filter((t) => t.active), [tasks]);
+  const completedToday = useMemo(
+    () => activeTasks.filter((t) => resolveCount(t) >= taskLimit(t)).length,
+    [activeTasks, todayCounts, weekCountsByTask],
+  );
+  const adventureProgress = activeTasks.length > 0 ? completedToday / activeTasks.length : 0;
+
   function resolveCount(t: Task): number {
     return t.repeatable === 'daily' ? (todayCounts.get(t.id) ?? 0) : (weekCountsByTask.get(t.id) ?? 0);
   }
@@ -95,6 +104,16 @@ export function TodayPage() {
       <div className="relative z-10 space-y-4">
         <BirthdayBanner />
         <ScoreCard />
+        {activeTasks.length > 0 && (
+          <>
+            <AdventureMap
+              progress={adventureProgress}
+              completed={completedToday}
+              total={activeTasks.length}
+            />
+            <TodayEncouragement progress={adventureProgress} />
+          </>
+        )}
         {SLOTS.map(({ id, label, emoji }) => (
           grouped[id].length > 0 && (
             <section key={id}>
@@ -125,7 +144,7 @@ export function TodayPage() {
             </section>
           )
         ))}
-        {tasks.filter((t) => t.active).length === 0 && (
+        {activeTasks.length === 0 && (
           <div className="bg-white rounded-huge p-8 text-center shadow-soft">
             <div className="text-5xl mb-2">📝</div>
             <p className="text-gray-600">还没有任务，去「设置 → 任务」添加吧！</p>

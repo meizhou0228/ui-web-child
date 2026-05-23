@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShopCard } from '@/components/ShopCard';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { TreasureChestScene } from '@/components/scenes/TreasureChestScene';
 import { Icon } from '@/components/Icon';
+import { RewardTierGroup } from '@/components/RewardTierGroup';
 import { useStore } from '@/store';
 import { selectBalance } from '@/store/selectors';
 import { useToast } from '@/components/ToastProvider';
 import { formatHM, formatDateZh } from '@/utils/date';
 import { celebrateRedemption } from '@/utils/celebrate';
 import { play } from '@/utils/sound';
+import { groupRewardsByTier, REWARD_TIERS } from '@/constants/gamification';
 
 export function ShopPage() {
   const balance = useStore(selectBalance);
@@ -22,6 +23,7 @@ export function ShopPage() {
   const [tab, setTab] = useState<'shop' | 'records'>('shop');
   const [pendingRedeem, setPendingRedeem] = useState<string | null>(null);
   const [chest, setChest] = useState<{ name: string; icon: string } | null>(null);
+  const groupedRewards = groupRewardsByTier(rewards);
 
   function handleRedeem(rewardId: string) {
     const reward = rewards.find((r) => r.id === rewardId);
@@ -54,13 +56,17 @@ export function ShopPage() {
       </div>
 
       {tab === 'shop' && (
-        <motion.div layout className="grid grid-cols-2 gap-3">
-          {rewards.map((r) => (
-            <ShopCard
-              key={r.id}
-              reward={r}
+        <motion.div layout className="space-y-4">
+          {REWARD_TIERS.map((tier) => (
+            <RewardTierGroup
+              key={tier.id}
+              title={tier.title}
+              range={tier.range}
+              rewards={groupedRewards[tier.id]}
               balance={balance}
-              onRedeem={() => setPendingRedeem(r.id)}
+              tone={tier.tone}
+              tierId={tier.id}
+              onRedeem={setPendingRedeem}
             />
           ))}
         </motion.div>

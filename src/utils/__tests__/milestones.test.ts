@@ -12,7 +12,7 @@ describe('milestone utils', () => {
     const m = findUnlockable(PRESET_MILESTONES, 350, [
       { milestoneId: 'm-100', unlockedAt: 0 },
     ]);
-    expect(m?.id).toBe('m-300');
+    expect(m?.id).toBe('m-200');
   });
 
   it('findUnlockable returns null when none cross threshold', () => {
@@ -23,6 +23,7 @@ describe('milestone utils', () => {
   it('findNext returns smallest threshold above earned', () => {
     const m = findNext(PRESET_MILESTONES, 350, [
       { milestoneId: 'm-100', unlockedAt: 0 },
+      { milestoneId: 'm-200', unlockedAt: 0 },
       { milestoneId: 'm-300', unlockedAt: 0 },
     ]);
     expect(m?.id).toBe('m-500');

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles/globals.css';
+import { registerServiceWorker } from './utils/registerServiceWorker';
 
 function checkStorage(): string | null {
   try {
@@ -32,4 +33,5 @@ if (err) {
       </BrowserRouter>
     </React.StrictMode>
   );
+  registerServiceWorker();
 }

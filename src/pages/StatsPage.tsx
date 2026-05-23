@@ -8,6 +8,8 @@ import { useStore } from '@/store';
 import {
   selectTotalEarned, selectStreak, selectTodayPoints,
 } from '@/store/selectors';
+import { BadgeWall } from '@/components/BadgeWall';
+import { StreakQuest } from '@/components/StreakQuest';
 import type { CategoryId } from '@/types';
 
 const CATEGORY_COLOR: Record<CategoryId, string> = {
@@ -18,6 +20,8 @@ const CATEGORY_COLOR: Record<CategoryId, string> = {
 
 export function StatsPage() {
   const records = useStore((s) => s.records);
+  const milestones = useStore((s) => s.milestones);
+  const unlockedMilestones = useStore((s) => s.unlockedMilestones);
   const unlockedCount = useStore((s) => s.unlockedMilestones.length);
   const streak = useStore(selectStreak);
   const earned = useStore(selectTotalEarned);
@@ -70,6 +74,9 @@ export function StatsPage() {
         <Card label="本周得分" value={`${last7Days.reduce((s, d) => s + d.points, 0)}`} />
         <Card label="累计 / 今日" value={`${earned} / ${today}`} />
       </div>
+
+      <StreakQuest streak={streak} />
+      <BadgeWall milestones={milestones} unlocked={unlockedMilestones} totalEarned={earned} />
 
       <Section title="近 7 天每日得分">
         <ResponsiveContainer width="100%" height={200}>
