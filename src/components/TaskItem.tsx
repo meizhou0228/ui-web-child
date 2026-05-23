@@ -5,14 +5,17 @@ import type { Task, Record as PointRecord } from '@/types';
 
 interface Props {
   task: Task;
-  todayRecord?: PointRecord;
+  count?: number;          // today's check-in count for this task
+  limit?: number;          // effective limit (dailyLimit or weeklyLimit), defaults to 1
+  lastRecord?: PointRecord;
   onCheckIn: () => void;
   onUndo: () => void;
 }
 
-export function TaskItem({ task, todayRecord, onCheckIn, onUndo }: Props) {
-  const done = !!todayRecord;
-  const canUndo = done && withinUndoWindow(todayRecord!.timestamp);
+export function TaskItem({ task, count = 0, limit = 1, lastRecord, onCheckIn, onUndo }: Props) {
+  const done = count >= limit;
+  const showProgress = limit > 1;
+  const canUndo = !!lastRecord && withinUndoWindow(lastRecord.timestamp);
 
   return (
     <motion.div
@@ -26,11 +29,18 @@ export function TaskItem({ task, todayRecord, onCheckIn, onUndo }: Props) {
     >
       <Icon type="task" name={task.icon} size={56} animated={!done} />
       <div className="flex-1">
-        <div className="font-bold text-lg">{task.name}</div>
-        <div className="text-sm text-gray-500">+{task.points} 分</div>
-        {done && (
+        <div className="font-bold text-lg flex items-center gap-2">
+          {task.name}
+          {showProgress && (
+            <span className={`text-xs px-2 py-0.5 rounded-full ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}`}>
+              {count}/{limit}
+            </span>
+          )}
+        </div>
+        <div className="text-sm text-gray-500">+{task.points} 分{showProgress && count > 0 && !done ? ` · 已加 ${count * task.points} 分` : ''}</div>
+        {done && lastRecord && (
           <div className="text-xs text-emerald-600 mt-1">
-            已完成 ✅ {formatHM(todayRecord!.timestamp)}
+            已完成 ✅ {formatHM(lastRecord.timestamp)}
           </div>
         )}
       </div>
@@ -40,7 +50,7 @@ export function TaskItem({ task, todayRecord, onCheckIn, onUndo }: Props) {
           aria-label="check in"
         >打卡</button>
       )}
-      {done && canUndo && (
+      {count > 0 && canUndo && (
         <button
           onClick={(e) => { e.stopPropagation(); onUndo(); }}
           className="text-xs text-gray-500 underline"

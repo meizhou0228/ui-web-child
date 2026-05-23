@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { ScoreCard } from '@/components/ScoreCard';
 import { TaskItem } from '@/components/TaskItem';
 import { useStore } from '@/store';
-import { selectTodayCheckedTaskIds } from '@/store/selectors';
+import { selectTodayCountsByTask, selectTodayLastRecordByTask } from '@/store/selectors';
+import { isoWeekKey } from '@/utils/date';
 import { useDayChange } from '@/hooks/useDayChange';
 import { useToast } from '@/components/ToastProvider';
 import type { TimeSlot, Task } from '@/types';
@@ -14,11 +15,17 @@ const SLOTS: { id: TimeSlot; label: string; emoji: string }[] = [
   { id: 'evening', label: '晚间', emoji: '🌙' },
 ];
 
+function taskLimit(t: Task): number {
+  if (t.repeatable === 'daily') return t.dailyLimit ?? 1;
+  return t.weeklyLimit ?? 1;
+}
+
 export function TodayPage() {
   useDayChange();
   const tasks = useStore((s) => s.tasks);
   const records = useStore((s) => s.records);
-  const checkedIds = useStore(selectTodayCheckedTaskIds);
+  const todayCounts = useStore(selectTodayCountsByTask);
+  const todayLasts = useStore(selectTodayLastRecordByTask);
   const checkIn = useStore((s) => s.checkIn);
   const undo = useStore((s) => s.undoRecord);
   const checkMilestones = useStore((s) => s.checkMilestones);
@@ -34,13 +41,29 @@ export function TodayPage() {
     return map;
   }, [tasks]);
 
-  function handleCheckIn(taskId: string, taskName: string, points: number) {
-    const r = checkIn(taskId);
+  // For once-tasks, count uses current ISO week instead of today.
+  const weekCountsByTask = useMemo(() => {
+    const week = isoWeekKey();
+    const m = new Map<string, number>();
+    for (const r of records) {
+      if (isoWeekKey(r.timestamp) !== week) continue;
+      m.set(r.taskId, (m.get(r.taskId) ?? 0) + 1);
+    }
+    return m;
+  }, [records]);
+
+  function resolveCount(t: Task): number {
+    return t.repeatable === 'daily' ? (todayCounts.get(t.id) ?? 0) : (weekCountsByTask.get(t.id) ?? 0);
+  }
+
+  function handleCheckIn(t: Task) {
+    const r = checkIn(t.id);
     if (!r) {
-      toast.show('warning', '今天已经完成过啦');
+      const limit = taskLimit(t);
+      toast.show('warning', limit > 1 ? `今日已满 ${limit} 次` : '今天已经完成过啦');
       return;
     }
-    toast.show('success', `${taskName} +${points} 分！`);
+    toast.show('success', `${t.name} +${t.points} 分！`);
     const m = checkMilestones();
     if (m) setUnlocked(m);
   }
@@ -59,15 +82,17 @@ export function TodayPage() {
             <h2 className="text-lg font-bold mb-2">{emoji} {label}</h2>
             <motion.div layout className="space-y-3">
               {grouped[id].map((t) => {
-                const isChecked = checkedIds.has(t.id);
-                const todayRec = isChecked ? records.find((r) => r.taskId === t.id && r.date === records.find((rr) => rr.taskId === t.id)?.date) : undefined;
+                const count = resolveCount(t);
+                const last = todayLasts.get(t.id);
                 return (
                   <TaskItem
                     key={t.id}
                     task={t}
-                    todayRecord={todayRec}
-                    onCheckIn={() => handleCheckIn(t.id, t.name, t.points)}
-                    onUndo={() => todayRec && handleUndo(todayRec.id)}
+                    count={count}
+                    limit={taskLimit(t)}
+                    lastRecord={last}
+                    onCheckIn={() => handleCheckIn(t)}
+                    onUndo={() => last && handleUndo(last.id)}
                   />
                 );
               })}

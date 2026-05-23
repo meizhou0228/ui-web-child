@@ -110,6 +110,21 @@ export function TaskForm({ initial, onSave, onCancel }: Props) {
         </div>
       </div>
 
+      {data.repeatable === 'daily' && (
+        <div>
+          <label className="block text-sm font-bold mb-1">每日可打卡次数</label>
+          <input
+            type="number"
+            min={1}
+            max={20}
+            value={data.dailyLimit ?? 1}
+            onChange={(e) => setData({ ...data, dailyLimit: Number(e.target.value) || 1 })}
+            className="w-full px-4 py-2 rounded-big border-2 border-gray-200"
+          />
+          <p className="text-xs text-gray-500 mt-1">设为 1 表示每天 1 次；多于 1 次允许重复加分（例如帮做家务）</p>
+        </div>
+      )}
+
       {data.repeatable === 'once' && (
         <div>
           <label className="block text-sm font-bold mb-1">每周可打卡次数</label>

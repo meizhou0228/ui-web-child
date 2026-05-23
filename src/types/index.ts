@@ -22,6 +22,9 @@ export interface Task {
   points: number;
   repeatable: RepeatType;
   timeSlot: TimeSlot;
+  /** For 'daily' tasks: max check-ins per day. Defaults to 1 (one check-in per day). */
+  dailyLimit?: number;
+  /** For 'once' tasks: max check-ins per ISO week. Defaults to 1. */
   weeklyLimit?: number;
   active: boolean;
   createdAt: number;
@@ -116,6 +119,7 @@ export interface PresetTaskSeed {
   points: number;
   repeatable: RepeatType;
   timeSlot: TimeSlot;
+  dailyLimit?: number;
   weeklyLimit?: number;
 }
 

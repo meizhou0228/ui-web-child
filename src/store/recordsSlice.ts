@@ -30,8 +30,11 @@ export const createRecordsSlice: StateCreator<
     const today = todayKey(now);
 
     if (task.repeatable === 'daily') {
-      const dup = state.records.find((r) => r.taskId === taskId && r.date === today);
-      if (dup) return null;
+      const limit = task.dailyLimit ?? 1;
+      const sameDayCount = state.records.filter(
+        (r) => r.taskId === taskId && r.date === today,
+      ).length;
+      if (sameDayCount >= limit) return null;
     } else {
       const limit = task.weeklyLimit ?? 1;
       const thisWeek = isoWeekKey(now);

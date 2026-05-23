@@ -12,7 +12,7 @@ export const PRESET_TASKS: PresetTaskSeed[] = [
   { categoryId: 'life',  name: '刷牙洗脸',           icon: 'toothbrush',    points: 3,  timeSlot: 'morning', repeatable: 'daily' },
   { categoryId: 'life',  name: '吃完早餐不挑食',     icon: 'bowl-of-food',  points: 5,  timeSlot: 'morning', repeatable: 'daily' },
   { categoryId: 'life',  name: '整理玩具/书桌',      icon: 'teddy-bear',    points: 5,  timeSlot: 'daytime', repeatable: 'daily' },
-  { categoryId: 'life',  name: '帮忙做一项家务',     icon: 'broom',         points: 6,  timeSlot: 'daytime', repeatable: 'daily' },
+  { categoryId: 'life',  name: '帮忙做一项家务',     icon: 'broom',         points: 6,  timeSlot: 'daytime', repeatable: 'daily', dailyLimit: 3 },
   { categoryId: 'life',  name: '屏幕时间 ≤ 30 分钟', icon: 'mobile-phone',  points: 5,  timeSlot: 'evening', repeatable: 'daily' },
   { categoryId: 'life',  name: '21:00 前洗漱完毕',   icon: 'soap',          points: 3,  timeSlot: 'evening', repeatable: 'daily' },
   { categoryId: 'life',  name: '21:30 入睡',         icon: 'sleeping-face', points: 5,  timeSlot: 'evening', repeatable: 'daily' },

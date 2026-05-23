@@ -22,6 +22,29 @@ export const selectTodayCheckedTaskIds = (s: AppStore): Set<string> => {
   return new Set(s.records.filter((r) => r.date === today).map((r) => r.taskId));
 };
 
+/** Today's check-in count per taskId. Used for dailyLimit progression. */
+export const selectTodayCountsByTask = (s: AppStore): Map<string, number> => {
+  const today = todayKey();
+  const map = new Map<string, number>();
+  for (const r of s.records) {
+    if (r.date !== today) continue;
+    map.set(r.taskId, (map.get(r.taskId) ?? 0) + 1);
+  }
+  return map;
+};
+
+/** Most recent record per taskId (for showing latest check-in time + undo). */
+export const selectTodayLastRecordByTask = (s: AppStore): Map<string, AppStore['records'][number]> => {
+  const today = todayKey();
+  const map = new Map<string, AppStore['records'][number]>();
+  for (const r of s.records) {
+    if (r.date !== today) continue;
+    const prev = map.get(r.taskId);
+    if (!prev || r.timestamp > prev.timestamp) map.set(r.taskId, r);
+  }
+  return map;
+};
+
 export function selectStreak(s: AppStore): number {
   if (s.records.length === 0) return 0;
   const days = new Set(s.records.map((r) => r.date));

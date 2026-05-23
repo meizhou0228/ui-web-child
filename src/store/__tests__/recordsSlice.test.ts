@@ -54,6 +54,20 @@ describe('recordsSlice.checkIn', () => {
     expect(store.getState().records).toHaveLength(1);
   });
 
+  it('allows multiple daily check-ins when dailyLimit > 1', () => {
+    const t = store.getState().addTask({
+      categoryId: 'life', name: '做家务', icon: 'broom', points: 3,
+      repeatable: 'daily', dailyLimit: 3, timeSlot: 'daytime', active: true,
+    });
+    expect(store.getState().checkIn(t.id)).not.toBeNull();
+    expect(store.getState().checkIn(t.id)).not.toBeNull();
+    expect(store.getState().checkIn(t.id)).not.toBeNull();
+    expect(store.getState().records).toHaveLength(3);
+    // Fourth attempt blocked
+    expect(store.getState().checkIn(t.id)).toBeNull();
+    expect(store.getState().records).toHaveLength(3);
+  });
+
   it('rejects once-task past weeklyLimit', () => {
     const t = store.getState().addTask({
       categoryId: 'study', name: 'w', icon: 'x', points: 30,
