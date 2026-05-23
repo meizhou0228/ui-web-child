@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, Suspense, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useRef, Suspense } from 'react';
 import { Mesh } from 'three';
+import Lottie from 'lottie-react';
 import type { Milestone } from '@/types';
 import { Icon } from '@/components/Icon';
 import { isLowTierDevice } from '@/utils/deviceTier';
@@ -26,11 +26,21 @@ interface Props {
 }
 
 export function MilestoneScene({ milestone, onClose }: Props) {
+  const [confettiAnim, setConfettiAnim] = useState<unknown | null>(null);
+
   useEffect(() => {
     if (!milestone) return;
     const id = setTimeout(onClose, 4000);
     return () => clearTimeout(id);
   }, [milestone, onClose]);
+
+  useEffect(() => {
+    if (!milestone || confettiAnim) return;
+    fetch('/assets/lottie/confetti.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setConfettiAnim)
+      .catch(() => setConfettiAnim(null));
+  }, [milestone, confettiAnim]);
 
   return (
     <AnimatePresence>
@@ -42,11 +52,17 @@ export function MilestoneScene({ milestone, onClose }: Props) {
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
+          {confettiAnim != null ? (
+            <div className="absolute inset-0 pointer-events-none">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              <Lottie animationData={confettiAnim as any} loop autoplay />
+            </div>
+          ) : null}
           <motion.div
             initial={{ scale: 0.5 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 120 }}
-            className="flex flex-col items-center gap-4"
+            className="flex flex-col items-center gap-4 relative z-10"
           >
             {isLowTierDevice() ? (
               <Icon type="milestone" name={milestone.icon} size={180} animated />

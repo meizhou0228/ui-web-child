@@ -11,6 +11,7 @@ import { isoWeekKey } from '@/utils/date';
 import { useDayChange } from '@/hooks/useDayChange';
 import { useToast } from '@/components/ToastProvider';
 import { celebrateCheckIn, celebrateMilestone } from '@/utils/celebrate';
+import { play } from '@/utils/sound';
 import { pickEncouragement } from '@/constants/encouragements';
 import type { TimeSlot, Task } from '@/types';
 
@@ -72,12 +73,14 @@ export function TodayPage() {
       ? { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight }
       : undefined;
     celebrateCheckIn(origin);
+    play('ding');
     toast.show('success', `${pickEncouragement()} ${t.name} +${t.points}`);
 
     const m = checkMilestones();
     if (m) {
       setUnlocked(m);
       celebrateMilestone();
+      play('milestone');
     }
   }
 
