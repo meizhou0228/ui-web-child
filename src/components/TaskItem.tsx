@@ -8,7 +8,7 @@ interface Props {
   count?: number;          // today's check-in count for this task
   limit?: number;          // effective limit (dailyLimit or weeklyLimit), defaults to 1
   lastRecord?: PointRecord;
-  onCheckIn: () => void;
+  onCheckIn: (e?: React.MouseEvent) => void;
   onUndo: () => void;
 }
 
@@ -24,7 +24,7 @@ export function TaskItem({ task, count = 0, limit = 1, lastRecord, onCheckIn, on
       whileTap={!done ? { scale: 0.97 } : undefined}
       className={`p-4 rounded-big bg-white shadow-soft flex items-center gap-4 cursor-pointer ${done ? 'opacity-70' : ''}`}
       style={{ transformStyle: 'preserve-3d', perspective: 800 }}
-      onClick={!done ? onCheckIn : undefined}
+      onClick={(e) => { if (!done) onCheckIn(e); }}
       data-testid={`task-${task.id}`}
     >
       <Icon type="task" name={task.icon} size={56} animated={!done} />

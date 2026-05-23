@@ -8,6 +8,7 @@ import { useStore } from '@/store';
 import { selectBalance } from '@/store/selectors';
 import { useToast } from '@/components/ToastProvider';
 import { formatHM, formatDateZh } from '@/utils/date';
+import { celebrateRedemption } from '@/utils/celebrate';
 
 export function ShopPage() {
   const balance = useStore(selectBalance);
@@ -30,6 +31,7 @@ export function ShopPage() {
       return;
     }
     setChest({ name: reward.name, icon: reward.icon });
+    celebrateRedemption();
   }
 
   return (

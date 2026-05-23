@@ -2,11 +2,16 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ScoreCard } from '@/components/ScoreCard';
 import { TaskItem } from '@/components/TaskItem';
+import { BirthdayBanner } from '@/components/BirthdayBanner';
+import { FloatingBackground } from '@/components/FloatingBackground';
+import { MascotCorner } from '@/components/MascotCorner';
 import { useStore } from '@/store';
 import { selectTodayCountsByTask, selectTodayLastRecordByTask } from '@/store/selectors';
 import { isoWeekKey } from '@/utils/date';
 import { useDayChange } from '@/hooks/useDayChange';
 import { useToast } from '@/components/ToastProvider';
+import { celebrateCheckIn, celebrateMilestone } from '@/utils/celebrate';
+import { pickEncouragement } from '@/constants/encouragements';
 import type { TimeSlot, Task } from '@/types';
 
 const SLOTS: { id: TimeSlot; label: string; emoji: string }[] = [
@@ -41,7 +46,6 @@ export function TodayPage() {
     return map;
   }, [tasks]);
 
-  // For once-tasks, count uses current ISO week instead of today.
   const weekCountsByTask = useMemo(() => {
     const week = isoWeekKey();
     const m = new Map<string, number>();
@@ -56,16 +60,25 @@ export function TodayPage() {
     return t.repeatable === 'daily' ? (todayCounts.get(t.id) ?? 0) : (weekCountsByTask.get(t.id) ?? 0);
   }
 
-  function handleCheckIn(t: Task) {
+  function handleCheckIn(t: Task, e?: React.MouseEvent) {
     const r = checkIn(t.id);
     if (!r) {
       const limit = taskLimit(t);
       toast.show('warning', limit > 1 ? `今日已满 ${limit} 次` : '今天已经完成过啦');
       return;
     }
-    toast.show('success', `${t.name} +${t.points} 分！`);
+    // Celebrate with confetti at click position (or center)
+    const origin = e
+      ? { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight }
+      : undefined;
+    celebrateCheckIn(origin);
+    toast.show('success', `${pickEncouragement()} ${t.name} +${t.points}`);
+
     const m = checkMilestones();
-    if (m) setUnlocked(m);
+    if (m) {
+      setUnlocked(m);
+      celebrateMilestone();
+    }
   }
 
   function handleUndo(recordId: string) {
@@ -74,32 +87,49 @@ export function TodayPage() {
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <ScoreCard />
-      {SLOTS.map(({ id, label, emoji }) => (
-        grouped[id].length > 0 && (
-          <section key={id}>
-            <h2 className="text-lg font-bold mb-2">{emoji} {label}</h2>
-            <motion.div layout className="space-y-3">
-              {grouped[id].map((t) => {
-                const count = resolveCount(t);
-                const last = todayLasts.get(t.id);
-                return (
-                  <TaskItem
-                    key={t.id}
-                    task={t}
-                    count={count}
-                    limit={taskLimit(t)}
-                    lastRecord={last}
-                    onCheckIn={() => handleCheckIn(t)}
-                    onUndo={() => last && handleUndo(last.id)}
-                  />
-                );
-              })}
-            </motion.div>
-          </section>
-        )
-      ))}
+    <div className="relative p-4 space-y-4 min-h-[80vh]">
+      <FloatingBackground count={9} />
+      <div className="relative z-10 space-y-4">
+        <BirthdayBanner />
+        <ScoreCard />
+        {SLOTS.map(({ id, label, emoji }) => (
+          grouped[id].length > 0 && (
+            <section key={id}>
+              <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
+                <span>{emoji}</span>
+                <span>{label}</span>
+                <span className="text-xs text-gray-400 font-normal">
+                  {grouped[id].filter((t) => resolveCount(t) >= taskLimit(t)).length}/{grouped[id].length}
+                </span>
+              </h2>
+              <motion.div layout className="space-y-3">
+                {grouped[id].map((t) => {
+                  const count = resolveCount(t);
+                  const last = todayLasts.get(t.id);
+                  return (
+                    <TaskItem
+                      key={t.id}
+                      task={t}
+                      count={count}
+                      limit={taskLimit(t)}
+                      lastRecord={last}
+                      onCheckIn={(e) => handleCheckIn(t, e)}
+                      onUndo={() => last && handleUndo(last.id)}
+                    />
+                  );
+                })}
+              </motion.div>
+            </section>
+          )
+        ))}
+        {tasks.filter((t) => t.active).length === 0 && (
+          <div className="bg-white rounded-huge p-8 text-center shadow-soft">
+            <div className="text-5xl mb-2">📝</div>
+            <p className="text-gray-600">还没有任务，去「设置 → 任务」添加吧！</p>
+          </div>
+        )}
+      </div>
+      <MascotCorner />
     </div>
   );
 }
