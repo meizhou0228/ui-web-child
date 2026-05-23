@@ -10,8 +10,15 @@ interface IconProps {
   onClick?: () => void;
 }
 
+function folderFor(type: IconType): string {
+  if (type === 'category') return 'categories';
+  if (type === 'child') return 'child';
+  return `${type}s`;
+}
+
 export function Icon({ type, name, size = 64, animated = false, className, onClick }: IconProps) {
-  const src = `/assets/icons/${type === 'category' ? 'categories' : `${type}s`}/${name}.webp`;
+  const folder = folderFor(type);
+  const src = `/assets/icons/${folder}/${name}.png`;
   return (
     <motion.img
       src={src}
@@ -23,7 +30,11 @@ export function Icon({ type, name, size = 64, animated = false, className, onCli
       loading="lazy"
       alt={name}
       onError={(e) => {
-        (e.currentTarget as HTMLImageElement).src = `/assets/icons/${type === 'category' ? 'categories' : `${type}s`}/_fallback.webp`;
+        const img = e.currentTarget as HTMLImageElement;
+        if (!img.dataset.fallback) {
+          img.dataset.fallback = '1';
+          img.src = `/assets/icons/${folder}/_fallback.png`;
+        }
       }}
       onClick={onClick}
       className={className}

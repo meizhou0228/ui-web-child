@@ -6,6 +6,7 @@ export const ICON_CATALOG = {
     'jumping-rope', 'runner', 'flexed-biceps',
     'closed-book', 'mountain', 'trophy',
     'piano', 'guitar', 'paint-brush', 'puzzle',
+    'sticker', 'sparkles', 'gift', 'crown',
   ],
   reward: [
     'tv', 'strawberry', 'sticker', 'game-dice', 'bento', 'moon',

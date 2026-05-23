@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { createTasksSlice, TasksSlice } from '../tasksSlice';
-import { PRESET_TASKS } from '@/constants/presetTasks';
+import { PRESET_TASKS, PRESET_WEEKLY_TASKS } from '@/constants/presetTasks';
 
 const makeStore = () => create<TasksSlice>()(immer((...a) => createTasksSlice(...a)));
 
@@ -59,9 +59,9 @@ describe('tasksSlice', () => {
     expect(store.getState().tasks).toHaveLength(0);
   });
 
-  it('restorePresetTasks loads 21 presets when empty', () => {
+  it('restorePresetTasks loads all preset daily + weekly seeds when empty', () => {
     store.getState().restorePresetTasks();
-    expect(store.getState().tasks.length).toBe(PRESET_TASKS.length + 3); // 18 daily + 3 weekly
+    expect(store.getState().tasks.length).toBe(PRESET_TASKS.length + PRESET_WEEKLY_TASKS.length);
   });
 
   it('restorePresetTasks does not duplicate existing names', () => {
