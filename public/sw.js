@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ui-web-child-v2';
+const CACHE_VERSION = '__BUILD_ID__';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -32,10 +32,14 @@ const CACHEABLE_EXTENSIONS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(APP_SHELL_CACHE)
-      .then((cache) => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting()),
+    caches.open(APP_SHELL_CACHE).then((cache) => cache.addAll(APP_SHELL)),
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (event) => {

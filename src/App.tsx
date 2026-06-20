@@ -3,6 +3,7 @@ import { NavBar } from '@/components/NavBar';
 import { ToastProvider } from '@/components/ToastProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { MilestoneScene } from '@/components/scenes/MilestoneScene';
+import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { useStore } from '@/store';
 import { useBootstrap } from '@/hooks/useBootstrap';
 import { useAppIcon } from '@/hooks/useAppIcon';
@@ -22,6 +23,7 @@ export default function App() {
     <ErrorBoundary>
       <ToastProvider>
         <div className="max-w-md mx-auto pb-20 min-h-screen">
+          <UpdatePrompt />
           <Routes>
             <Route path="/" element={<TodayPage />} />
             <Route path="/history" element={<HistoryPage />} />
