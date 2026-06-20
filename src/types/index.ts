@@ -53,6 +53,8 @@ export interface Record {
   date: string;        // YYYY-MM-DD local
   timestamp: number;
   note?: string;
+  /** True when the record was added retroactively via 补打卡. */
+  backfilled?: boolean;
 }
 
 /**

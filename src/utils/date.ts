@@ -36,3 +36,7 @@ export function formatHM(timestamp: number): string {
 export function formatDateZh(date: string): string {
   return dayjs(date).format('YYYY-MM-DD');
 }
+
+export function noonOf(dateKey: string): number {
+  return dayjs(dateKey).hour(12).minute(0).second(0).millisecond(0).valueOf();
+}

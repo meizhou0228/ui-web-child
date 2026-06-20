@@ -19,7 +19,8 @@ export function MascotCorner() {
       <motion.div
         animate={{ y: [0, -6, 0], rotate: [-2, 2, -2] }}
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        className="flex items-end gap-1"
+        className="flex items-end gap-1 pointer-events-auto cursor-default"
+        onClick={(e) => e.stopPropagation()}
       >
         <img
           src={`/assets/icons/child/${child.icon}.png`}

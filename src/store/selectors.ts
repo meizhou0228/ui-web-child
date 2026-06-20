@@ -47,7 +47,7 @@ export const selectTodayLastRecordByTask = (s: AppStore): Map<string, AppStore['
 
 export function selectStreak(s: AppStore): number {
   if (s.records.length === 0) return 0;
-  const days = new Set(s.records.map((r) => r.date));
+  const days = new Set(s.records.filter((r) => !r.backfilled).map((r) => r.date));
   let streak = 0;
   let cursor = dayjs();
   while (days.has(cursor.format('YYYY-MM-DD'))) {

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import dayjs from 'dayjs';
 import {
-  todayKey, isSameDay, isoWeekKey, withinUndoWindow, FIVE_MINUTES_MS,
+  todayKey, isSameDay, isoWeekKey, withinUndoWindow, FIVE_MINUTES_MS, noonOf,
 } from '../date';
 
 describe('date utils', () => {
@@ -41,5 +42,12 @@ describe('date utils', () => {
   it('withinUndoWindow false past 5 min', () => {
     const t = Date.now();
     expect(withinUndoWindow(t, t + FIVE_MINUTES_MS + 100)).toBe(false);
+  });
+});
+
+describe('noonOf', () => {
+  it('returns noon of the given date key', () => {
+    const ts = noonOf('2026-05-20');
+    expect(dayjs(ts).format('YYYY-MM-DD HH:mm:ss')).toBe('2026-05-20 12:00:00');
   });
 });

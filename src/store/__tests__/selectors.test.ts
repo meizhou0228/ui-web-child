@@ -3,6 +3,7 @@ import { useStore } from '../index';
 import {
   selectTotalEarned, selectTotalSpent, selectBalance, selectTodayPoints, selectStreak,
 } from '../selectors';
+import { makeRecord } from '../../../test/factories';
 
 function reset() {
   useStore.setState({
@@ -76,5 +77,36 @@ describe('selectors', () => {
     useStore.getState().checkIn(t.id);
     expect(selectStreak(useStore.getState())).toBe(3);
     vi.useRealTimers();
+  });
+
+  it('selectStreak ignores days with only backfilled records', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-05-23T10:00'));
+    useStore.setState({ records: [
+      makeRecord({ date: '2026-05-23' }),
+      makeRecord({ date: '2026-05-22', backfilled: true }),
+    ] } as never);
+    expect(selectStreak(useStore.getState())).toBe(1);
+    vi.useRealTimers();
+  });
+
+  it('selectStreak still counts a day that also has a non-backfilled record', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-05-23T10:00'));
+    useStore.setState({ records: [
+      makeRecord({ date: '2026-05-23', backfilled: true }),
+      makeRecord({ date: '2026-05-23' }),
+      makeRecord({ date: '2026-05-22' }),
+    ] } as never);
+    expect(selectStreak(useStore.getState())).toBe(2);
+    vi.useRealTimers();
+  });
+
+  it('selectTotalEarned includes backfilled points', () => {
+    useStore.setState({ records: [
+      makeRecord({ points: 10 }),
+      makeRecord({ points: 7, backfilled: true }),
+    ] } as never);
+    expect(selectTotalEarned(useStore.getState())).toBe(17);
   });
 });
