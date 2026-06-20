@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { MilestoneScene } from '@/components/scenes/MilestoneScene';
 import { useStore } from '@/store';
 import { useBootstrap } from '@/hooks/useBootstrap';
+import { useAppIcon } from '@/hooks/useAppIcon';
 import { TodayPage } from '@/pages/TodayPage';
 import { HistoryPage } from '@/pages/HistoryPage';
 import { ShopPage } from '@/pages/ShopPage';
@@ -13,6 +14,7 @@ import { SettingsPage } from '@/pages/SettingsPage';
 
 export default function App() {
   useBootstrap();
+  useAppIcon();
   const unlocked = useStore((s) => s.recentlyUnlocked);
   const setUnlocked = useStore((s) => s.setRecentlyUnlocked);
 
