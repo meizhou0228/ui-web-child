@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@/components/Icon';
 import { ConfirmModal } from '@/components/ConfirmModal';
+import { BackfillModal } from '@/components/BackfillModal';
 import { useStore } from '@/store';
 import { formatHM } from '@/utils/date';
 import type { CategoryId } from '@/types';
@@ -15,6 +16,7 @@ export function HistoryPage() {
   const [range, setRange] = useState<Range>('week');
   const [filter, setFilter] = useState<Filter>('all');
   const [confirmDel, setConfirmDel] = useState<string | null>(null);
+  const [backfillOpen, setBackfillOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const now = Date.now();
@@ -42,7 +44,13 @@ export function HistoryPage() {
 
   return (
     <div className="p-4 space-y-4">
-      <h1 className="text-2xl font-bold">积分明细</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">积分明细</h1>
+        <button
+          onClick={() => setBackfillOpen(true)}
+          className="px-3 py-1.5 rounded-big bg-sky-brand text-white text-sm font-bold shadow-3d"
+        >＋ 补打卡</button>
+      </div>
 
       <div className="flex gap-2 overflow-x-auto">
         {(['today', 'week', 'month', 'all'] as Range[]).map((r) => (
@@ -101,6 +109,8 @@ export function HistoryPage() {
         onConfirm={() => { if (confirmDel) removeRecord(confirmDel); setConfirmDel(null); }}
         onCancel={() => setConfirmDel(null)}
       />
+
+      <BackfillModal open={backfillOpen} onClose={() => setBackfillOpen(false)} />
     </div>
   );
 }
