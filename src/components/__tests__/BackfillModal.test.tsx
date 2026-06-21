@@ -39,4 +39,25 @@ describe('BackfillModal', () => {
     fireEvent.click(screen.getByLabelText(`backfill-${t.id}`));
     expect(useStore.getState().records).toHaveLength(1);
   });
+
+  it('shows no undo control before any backfill exists', () => {
+    const t = useStore.getState().addTask({
+      categoryId: 'study', name: '朗读', icon: 'book', points: 8,
+      repeatable: 'daily', timeSlot: 'daytime', active: true,
+    });
+    render(<ToastProvider><BackfillModal open onClose={() => {}} /></ToastProvider>);
+    expect(screen.queryByLabelText(`undo-backfill-${t.id}`)).toBeNull();
+  });
+
+  it('undoes a backfilled record from the task row', () => {
+    const t = useStore.getState().addTask({
+      categoryId: 'study', name: '朗读', icon: 'book', points: 8,
+      repeatable: 'daily', timeSlot: 'daytime', active: true,
+    });
+    render(<ToastProvider><BackfillModal open onClose={() => {}} /></ToastProvider>);
+    fireEvent.click(screen.getByLabelText(`backfill-${t.id}`));
+    expect(useStore.getState().records).toHaveLength(1);
+    fireEvent.click(screen.getByLabelText(`undo-backfill-${t.id}`));
+    expect(useStore.getState().records).toHaveLength(0);
+  });
 });
