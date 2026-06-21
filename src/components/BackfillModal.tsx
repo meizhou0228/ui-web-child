@@ -16,6 +16,7 @@ export function BackfillModal({ open, onClose }: Props) {
   const tasks = useStore((s) => s.tasks);
   const records = useStore((s) => s.records);
   const backfillCheckIn = useStore((s) => s.backfillCheckIn);
+  const removeRecord = useStore((s) => s.removeRecord);
   const checkMilestones = useStore((s) => s.checkMilestones);
   const setUnlocked = useStore((s) => s.setRecentlyUnlocked);
   const toast = useToast();
@@ -35,6 +36,11 @@ export function BackfillModal({ open, onClose }: Props) {
     toast.show('success', `已补打卡 ${name} +${points}`);
     const m = checkMilestones();
     if (m) setUnlocked(m);
+  }
+
+  function handleUndo(recordId: string, name: string) {
+    removeRecord(recordId);
+    toast.show('info', `已撤销 ${name}`);
   }
 
   return (
@@ -79,13 +85,17 @@ export function BackfillModal({ open, onClose }: Props) {
 
             <ul className="space-y-2">
               {activeTasks.map((t) => {
-                const count = records.filter((r) => r.taskId === t.id && r.date === selected).length;
+                const dayRecords = records.filter((r) => r.taskId === t.id && r.date === selected);
+                const count = dayRecords.length;
+                const lastBackfilled = dayRecords
+                  .filter((r) => r.backfilled)
+                  .sort((a, b) => b.timestamp - a.timestamp)[0];
                 return (
-                  <li key={t.id}>
+                  <li key={t.id} className="flex items-center gap-2">
                     <button
                       onClick={() => handleTap(t.id, t.name, t.points)}
                       aria-label={`backfill-${t.id}`}
-                      className="w-full flex items-center gap-3 p-3 bg-white rounded-big shadow-soft text-left"
+                      className="flex-1 flex items-center gap-3 p-3 bg-white rounded-big shadow-soft text-left"
                     >
                       <Icon type="task" name={t.icon} size={40} />
                       <div className="flex-1">
@@ -95,6 +105,13 @@ export function BackfillModal({ open, onClose }: Props) {
                         </div>
                       </div>
                     </button>
+                    {lastBackfilled && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleUndo(lastBackfilled.id, t.name); }}
+                        aria-label={`undo-backfill-${t.id}`}
+                        className="shrink-0 px-3 py-2 rounded-big bg-gray-100 text-gray-500 text-sm font-bold"
+                      >✕ 撤销</button>
+                    )}
                   </li>
                 );
               })}
